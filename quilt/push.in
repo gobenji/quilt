@@ -247,6 +247,20 @@ add_patch()
 			printf $"Applied patch %s (%sneeds refresh)\n" \
 			       "$(print_patch "$patch")" "$text"
 		fi
+
+		local f
+		quilt_command files | while read f; do
+			if [ -r "$f" ]
+			then
+				if [ $(stat -c "%h" "$f") -eq 1 ]
+				then
+					chmod +w "$f"
+				else
+					echo "Warning: file $f has link count != 1, not changing permissions"
+				fi
+			fi
+		done
+
 	else
 		rollback_patch "$patch"
 		tmp=$(gen_tempfile)
