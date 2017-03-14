@@ -173,7 +173,18 @@ cleanup_patch_output()
 			'
 		fi
 	else
-		cat
+		if [ -n "$opt_force" -a -n "$opt_merge" ]; then
+			awk '
+			/^patching file / { filename = substr($0, 15) }
+			/NOT MERGED/ {
+				print filename >> "'"$conflicts"'"
+			}
+			{ print }
+			'
+			[ -f "$conflicts" ] && echo "$(sort -u "$conflicts")" > "$conflicts"
+		else
+			cat
+		fi
 	fi
 }
 
@@ -194,6 +205,7 @@ add_patch()
 
 	if [ -n "$opt_force" ]; then
 		find ./ -name *.rej -delete
+		rm -f "$conflicts"
 	fi
 
 	apply_patch "$patch" "$patch_file"
@@ -423,6 +435,9 @@ then
 	printf $"No patch applied\n" >&2
 	exit 2
 fi
+
+conflicts="$QUILT_PC/merge-conflicts"
+
 
 # In theory, these patches can't be already applied. However in the case
 # of a generated or manually tweaked series file, this could happen and
