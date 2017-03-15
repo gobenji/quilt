@@ -1185,6 +1185,18 @@ then
 		exit 1
 	fi
 
+	# If operating in an expanded tree from the kernel-source.git
+	# repository, replace a plain "series" file with a link to the source
+	# "series.conf" file. This will allow quilt commands which change the
+	# series file (like `quilt import`) to automatically update
+	# "series.conf".
+	if [ -r series ] && ! ( [ -L series ] &&
+		head -n1 series | grep -qv "^# Kernel patches configuration file$" ) &&
+		[ -r patches/series.conf ] &&
+		head -n1 patches/series.conf | grep -q "^# Kernel patches configuration file$"; then
+		ln -sf patches/series.conf series
+	fi
+
 	# Check if series file was modified manually, and if this is the case,
 	# make sure it is still consistent with the applied patches
 	if [ -s "$DB" -a ! "$DB" -nt "$SERIES" ] && [ "$QUILT_COMMAND" != pop ] && ! consistency_check
