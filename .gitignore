@@ -39,3 +39,7 @@ compat/*
 
 test/.*.ok
 test/.depend
+
+.*
+!.gitignore
+*~
