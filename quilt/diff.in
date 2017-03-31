@@ -21,7 +21,7 @@ setup_colors
 
 usage()
 {
-	printf $"Usage: quilt diff [-p n|-p ab] [-u|-U num|-c|-C num] [--combine patch|-z] [-R] [-P patch] [--snapshot] [--diff=utility] [--no-timestamps] [--no-index] [--sort] [--color[=always|auto|never]] [file ...]\n"
+	printf $"Usage: quilt diff [-p n|-p ab] [-u|-U num|-c|-C num] [--combine patch|-z] [-R] [-P patch] [--snapshot] [--diff=utility] [--no-timestamps] [--no-index] [--git] [--sort] [--color[=always|auto|never]] [file ...]\n"
 
 	if [ x$1 = x-h ]
 	then
@@ -46,6 +46,9 @@ included.
 
 --no-index
 	Do not output Index: lines.
+
+--git
+	Generate a git-style diff.
 
 -z	Write to standard output the changes that have been made
 	relative to the topmost or specified patch.
@@ -139,7 +142,7 @@ die()
 }
 
 options=`getopt -o p:P:RuU:cC:zh --long diff:,snapshot,no-timestamps \
-				 --long no-index,combine:,color:: \
+				 --long no-index,git,combine:,color:: \
 				 --long sort -- "$@"`
 
 if [ $? -ne 0 ]
@@ -194,6 +197,9 @@ do
 		shift ;;
 	--no-index)
 		QUILT_NO_DIFF_INDEX=1
+		shift ;;
+	--git)
+		QUILT_GIT_DIFF=1
 		shift ;;
 	--sort)
 		opt_sort=1

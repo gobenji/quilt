@@ -19,7 +19,7 @@ fi
 
 usage()
 {
-	printf $"Usage: quilt refresh [-p n|-p ab] [-u|-U num|-c|-C num] [-z[new_name]] [-f] [--no-timestamps] [--no-index] [--diffstat] [--sort] [--backup] [--strip-trailing-whitespace] [patch]\n"
+	printf $"Usage: quilt refresh [-p n|-p ab] [-u|-U num|-c|-C num] [-z[new_name]] [-f] [--no-timestamps] [--no-index] [--git] [--diffstat] [--sort] [--backup] [--strip-trailing-whitespace] [patch]\n"
 
 	if [ x$1 = x-h ]
 	then
@@ -58,6 +58,9 @@ patch.
 --no-index
 	Do not output Index: lines.
 
+--git
+	Generate a git-style diff.
+
 --diffstat
 	Add a diffstat section to the patch header, or replace the
 	existing diffstat section.
@@ -88,7 +91,7 @@ die()
 }
 
 options=`getopt -o p:uU:cC:fz::h --long no-timestamps,diffstat,backup,sort \
-				 --long no-index \
+				 --long no-index,git \
 				 --long strip-trailing-whitespace -- "$@"`
 
 if [ $? -ne 0 ]
@@ -125,6 +128,9 @@ do
 		shift ;;
 	--no-index)
 		QUILT_NO_DIFF_INDEX=1
+		shift ;;
+	--git)
+		QUILT_GIT_DIFF=1
 		shift ;;
 	--diffstat)
 		opt_diffstat=1

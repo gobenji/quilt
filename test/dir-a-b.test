@@ -39,6 +39,24 @@
 	> @@ -1 +0,0 @@
 	> -d
 
+	$ quilt diff -p ab --git
+	> diff --quilt a/test.txt b/test.txt
+	> --- a/test.txt
+	> +++ b/test.txt
+	> @@ -1 +1 @@
+	> -a
+	> +b
+	> diff --quilt /dev/null b/test2.txt
+	> --- /dev/null
+	> +++ b/test2.txt
+	> @@ -0,0 +1 @@
+	> +c
+	> diff --quilt a/test3.txt /dev/null
+	> --- a/test3.txt
+	> +++ /dev/null
+	> @@ -1 +0,0 @@
+	> -d
+
 	$ rm -f patches/ab.diff
 	$ quilt refresh -p ab --no-index
 	> Refreshed patch %{P}ab.diff

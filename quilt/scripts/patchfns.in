@@ -761,6 +761,9 @@ diff_file()
 		if [[ "$line" =~ ^Binary\ files\ .*\ differ$ ]]
 		then
 			status=1
+		elif [ "$QUILT_GIT_DIFF" ]
+		then
+			echo "diff --quilt $old_hdr $new_hdr"
 		elif [ -z "$QUILT_NO_DIFF_INDEX" ]
 		then
 			echo "Index: $index"
