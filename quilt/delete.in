@@ -136,6 +136,7 @@ then
 			exit 1
 		fi
 	fi
+	rm -f "$QUILT_PC/$patch~refresh"
 fi
 ### Local Variables:
 ### mode: shell-script

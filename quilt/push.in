@@ -200,12 +200,11 @@ add_patch()
 
 	if [ $status -eq 0 -o -n "$opt_force" ]
 	then
+		local refresh="$QUILT_PC/$patch~refresh"
 		add_to_db "$patch"
-		if [ $status -eq 0 ]
+		if [ $status -ne 0 ]
 		then
-			rm -f "$QUILT_PC/$patch~refresh"
-		else
-			touch "$QUILT_PC/$patch~refresh"
+			touch "$refresh"
 		fi
 
 		if [ -e "$QUILT_PC/$patch" ]
@@ -223,10 +222,14 @@ add_patch()
 		then
 			printf $"Patch %s appears to be empty; applied\n" \
 			       "$(print_patch "$patch")"
-		elif [ $status -ne 0 ]
+		elif [ -e "$refresh" ]
 		then
-			printf $"Applied patch %s (forced; needs refresh)\n" \
-			       "$(print_patch "$patch")"
+			local text
+			if [ "$opt_force" ]; then
+				text="forced; "
+			fi
+			printf $"Applied patch %s (%sneeds refresh)\n" \
+			       "$(print_patch "$patch")" "$text"
 		fi
 	else
 		rollback_patch "$patch"
