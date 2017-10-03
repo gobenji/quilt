@@ -176,7 +176,7 @@ then
 	fi
 fi
 
-before=$(patch_after "$(top_patch)")
+after=$(top_patch)
 for orig_patch_file in "$@"
 do
 	if [ -n "$opt_patch" ]
@@ -243,12 +243,13 @@ do
 	[ "$merged_patch_file" != "$patch_file" ] && rm -f "$merged_patch_file"
 
 	if ! patch_in_series $patch &&
-	   ! insert_in_series $patch "$patch_args" "$before"
+	   ! insert_in_series $patch "$patch_args" "$after"
 	then
 		printf $"Failed to insert patch %s into file series\n" \
 		       "$(print_patch $patch)" >&2
 		exit 1
 	fi
+	after=$patch
 
 	rm -rf $QUILT_PC/$patch
 done

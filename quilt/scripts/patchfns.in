@@ -237,14 +237,14 @@ patch_in_series()
 insert_in_series()
 {
 	local patch=$1 patch_args=$2
-	local before tmpfile
+	local after tmpfile
 
 	if [ -e "$SERIES" -a ! -f "$SERIES" ]; then
 		printf $"%s is not a regular file\n" "$SERIES" >&2
 		return 1
 	fi
 
-	before=${3-$(patch_after "$(top_patch)")}
+	after=${3-$(top_patch)}
 
 	if [ -n "$patch_args" ]
 	then
@@ -253,31 +253,25 @@ insert_in_series()
 
 	tmpfile=$(gen_tempfile) || return 1
 	mkdir -p "$(dirname "$SERIES")"
-	if [ -n "$before" ]
+	if [ -n "$after" ]
 	then
-		awk '
-		/^[[:space:]]*'"$(quote_re $before)"'([ \t]|$)/ \
-				{
-					match($0, "^([[:space:]]*)'"$(quote_re $before | sed -e 's:\\:\\\\:g')"'([ \t]|$)", a)
-					print a[1] "'"$patch$patch_args"'"
-				}
-				{ print }
-		' "$SERIES" > $tmpfile
+		sed -Ee 's/^([[:space:]]*)'"$(quote_re $after)"'([ \t]|$).*$/&\n\1'"$(quote_re $patch$patch_args)"'/' \
+			"$SERIES" > $tmpfile
 		status=$?
 		if [ $status -ne 0 ]
 		then
 			rm -f $tmpfile
 			return 1
 		fi
+
+		# Ensure there is a trailing newline in the file
+		ensure_trailing_newline $tmpfile
 	else
+		echo "$patch$patch_args" > $tmpfile
 		if [ -e "$SERIES" ]
 		then
-			cat "$SERIES" > $tmpfile
-
-			# Ensure there is a trailing newline before we append the rest
-			ensure_trailing_newline $tmpfile
+			cat "$SERIES" >> $tmpfile
 		fi
-		echo "$patch$patch_args" >> $tmpfile
 	fi
 	cat $tmpfile > "$SERIES"
 	rm -f $tmpfile
